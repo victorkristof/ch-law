@@ -32,7 +32,7 @@ if __name__ == '__main__':
         filename = law_folder+ '.html'
         save_html(html, filename)
         os.mkdir('%s/%s' % (droit_interne_data_dir, i))
-        for j in range(1, 10):
+        for j in range(0, 10):
             law_id = i * 10 + j
             url = template_url % law_id
             html = get_html(url)
