@@ -1,5 +1,6 @@
 import sys
 import time
+from datetime import timedelta
 
 
 class ProgressBar:
@@ -23,15 +24,17 @@ class ProgressBar:
         self.end_value = end_value
         self.current = 0
         self.bar_length = bar_length
+        self.start_time = 0
         if text:
             self.text = text
         else:
             self.text = "Progress"
 
+    def start(self):
+        # Init starting time
+        self.start_time = int(time.time())
         # Start displaying the bar
-        sys.stdout.write("\r{0}: [{1}] {2}%".format(self.text,
-                                                    ' ' * self.bar_length,
-                                                    self.current))
+        sys.stdout.write("\r{0}: [{1}] {2}%".format(self.text, ' ' * self.bar_length, self.current))
         sys.stdout.flush()
 
     def update(self, new_val):
@@ -50,7 +53,8 @@ class ProgressBar:
                                                         int(round(percent * 100))))
             sys.stdout.flush()
             if self.current == self.end_value:
-                sys.stdout.write("\n")
+                elapsed_time = timedelta(seconds=(int(time.time()) - self.start_time))
+                sys.stdout.write(" Elapsed time: %s\n" % elapsed_time)
 
 
 def progress_bar_test(end_value, text, bar_length=20):
