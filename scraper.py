@@ -2,6 +2,7 @@ import requests
 from progressbar import ProgressBar
 import html
 
+
 class Scraper:
 
     def __init__(self):
@@ -46,6 +47,7 @@ class Scraper:
         """
         total = len(links)
         bar = ProgressBar(total)
+        bar.start()
         for i, url in enumerate(links):
             html = self.get_html(url)
             self.save_html(html, destinations[i])
