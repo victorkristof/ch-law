@@ -41,6 +41,23 @@ def generate_article_id(name, law_id):
     article_id = law_id + '-' + article_id
     return article_id
 
+
+def get_foot_note(a_tag):
+    # Get content on href attribute
+    href = a_tag.get('href')
+    # Get foot note reference number
+    foot_ref = int(pq(a_tag).text())
+    # Get all foot notes texts in the page
+    foot_texts = pq(law_content)("a[name]")
+    for foot_text in foot_texts:
+        if foot_text.get('name') == href[1:]: # Remove the first character as it is a #
+            # Separate all foot notes texts
+            text = pq(foot_text.getparent()).html().split('<br/>')[foot_ref-1]
+            # Replace foot note reference number from text
+            text = text.replace('<a name="%s"><sup>%s</sup></a> ' % (foot_text.get('name'), foot_ref), '')
+            return foot_ref, text
+
+
 def extract_article_name(article, law_id, law_content):
     title_node = pq(article.getprevious())
     links = pq(title_node)("a")
@@ -49,15 +66,15 @@ def extract_article_name(article, law_id, law_content):
     for link in links:
         if pq(link).text():
             href = link.get('href')
+            # If it is a reference in the page (corresponds to a foot note in this case)
             if href[0] == "#":
-                foot_ref = int(pq(link).text())
-                foot_texts = pq(law_content)("a[name]")
-                for foot_text in foot_texts:
-                    if foot_text.get('name') == href[1:]:
-                        text = pq(foot_text.getparent()).html().split('<br/>')[foot_ref-1].replace('<a name="%s"><sup>%s</sup></a> ' % (foot_text.get('name'), foot_ref), '')
-                        foot_notes[foot_ref] = text
-            if "index.html" in href:
+                foot_ref, text = get_foot_note(link)
+                foot_notes[foot_ref] = text
+            # If it is an external link (corresponds to the name of the article)
+            elif "index.html" in href:
                 name = pq(link).text()
+
+    # Add all foot notes tag at end of name
     for k in foot_notes.keys():
         name += "<sup>%s</sup>" % k
 
