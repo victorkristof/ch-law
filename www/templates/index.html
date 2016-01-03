@@ -1,0 +1,75 @@
+{% extends "skeleton.html" %}
+
+{% block content %}
+<form action="/search" method="post" role="form">
+    <div class="form-group form-group-lg">
+        <label for="search">Search a law</label>
+        <input type="text" id="search" name="search" class="form-control" placeholder="Ex: 210, 741.313, ...">
+        <span id="error-message" class="text-danger help-block hidden"></span>
+    </div>
+</form>
+<div id="law" class="row-fluid"></div>
+{% endblock %}
+
+{% block extra_js %}
+<script type="text/javascript">
+
+function displayLaw(law) {
+    // Title
+    law_html = "<h1>" +law['title'] + " <span class='small'>" + law['law_id'] +"</span></h1>";
+
+    // Subtitle
+    if (law['subtitle']) {
+        law_html += "<h2>" + law['subtitle'] + "</h2>";
+    }
+
+    // Preamble
+    law_html += "<div id='preamble'>";
+    preamble = law['preamble'];
+    for (i = 0, len = preamble.length; i < len; i++) {
+        tag = preamble[i][0];
+        content = preamble[i][1];
+        law_html += "<" + tag + ">" + content + "</" + tag + ">";
+    }
+    law_html += "</div>";
+
+    //Articles
+    law_html += "<div id='articles'>";
+    articles = law['articles'];
+    for (i = 0, len = articles.length; i < len; i++) {
+        article = articles[i];
+        law_html += "<h5 id='" + article['article_id'] + "'>" + article['name'] + "</h5>";
+    }
+    law_html += "</div>";
+
+    law_html += "</div>";
+    $('#law').html(law_html);
+}
+
+$(function() {
+    $('form').on('submit', function() {
+        event.preventDefault();
+        law_div = $('#law');
+        law_div.addClass('hidden');
+        error_message = $('#error-message');
+        error_message.addClass('hidden');
+        $.ajax({
+            url: '/search',
+            data: $('form').serialize(),
+            dataType: 'json',
+            type: 'POST',
+            success: function(response) {
+                displayLaw(response);
+                law_div.removeClass('hidden');
+                console.log(response);
+            },
+            error: function(error) {
+                error_message.text(error.responseText);
+                error_message.removeClass('hidden');
+                console.log(error);
+            }
+        });
+    });
+});
+</script>
+{% endblock %}
