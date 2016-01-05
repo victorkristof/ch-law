@@ -50,10 +50,12 @@ class ProgressBar:
         self.start_time = int(time.time())
         # Start displaying the bar
         if self.count:
-            sys.stdout.write("\r{0}: [{1}] {2}% (0/{3})".format(self.text,
-                                                                ' ' * self.bar_length,
-                                                                self.current,
-                                                                self.end_value))
+            sys.stdout.write("\r{0} ({4:>{5}}/{3}): [{1}] {2}%".format(self.text,
+                                                                       ' ' * self.bar_length,
+                                                                       0,
+                                                                       self.end_value,
+                                                                       0,
+                                                                       len(str(self.end_value))))
         else:
             sys.stdout.write("\r{0}: [{1}] {2}%".format(self.text,
                                                         ' ' * self.bar_length,
@@ -72,11 +74,12 @@ class ProgressBar:
             hashes = '#' * int(round(percent * self.bar_length))
             spaces = ' ' * (self.bar_length - len(hashes))
             if self.count:
-                sys.stdout.write("\r{0}: [{1}] {2}% ({3}/{4})".format(self.text,
-                                                                      hashes + spaces,
-                                                                      int(round(percent * 100)),
-                                                                      self.current,
-                                                                      self.end_value))
+                sys.stdout.write("\r{0} ({4:>{5}}/{3}): [{1}] {2}%".format(self.text,
+                                                                           hashes + spaces,
+                                                                           int(round(percent * 100)),
+                                                                           self.end_value,
+                                                                           self.current,
+                                                                           len(str(self.end_value))))
             else:
                 sys.stdout.write("\r{0}: [{1}] {2}%".format(self.text,
                                                             hashes + spaces,
